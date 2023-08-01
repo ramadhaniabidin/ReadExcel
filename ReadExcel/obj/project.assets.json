@@ -4756,19 +4756,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ramad\\.nuget\\packages\\": {}
+    "C:\\Users\\Bidin\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\ReadExcel\\ReadExcel.csproj",
+      "projectUniqueName": "C:\\Users\\Bidin\\Documents\\BELAJAR\\C#\\ReadExcel\\ReadExcel\\ReadExcel\\ReadExcel.csproj",
       "projectName": "ReadExcel",
-      "projectPath": "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\ReadExcel\\ReadExcel.csproj",
-      "packagesPath": "C:\\Users\\ramad\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\ReadExcel\\obj\\",
+      "projectPath": "C:\\Users\\Bidin\\Documents\\BELAJAR\\C#\\ReadExcel\\ReadExcel\\ReadExcel\\ReadExcel.csproj",
+      "packagesPath": "C:\\Users\\Bidin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Bidin\\Documents\\BELAJAR\\C#\\ReadExcel\\ReadExcel\\ReadExcel\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\ramad\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Bidin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4815,7 +4820,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -10,6 +10,18 @@ namespace ReadExcel
 {
     public class ExcelManager
     {
+        public int Test(string Path)
+        {
+            int sheets;
+            
+            using(XLWorkbook workbook = new XLWorkbook(Path))
+            {
+                sheets = workbook.Worksheets.Count;
+            }
+
+            return sheets;
+        }
+
         public DataTable ExcelRead(string Path)
         {
             //Save the uploaded Excel file.
@@ -20,7 +32,7 @@ namespace ReadExcel
             using(XLWorkbook workbook = new XLWorkbook(Path))
             {
                 //Read the first Sheet from Excel file.
-                IXLWorksheet worksheet = workbook.Worksheet(1);
+                IXLWorksheet worksheet = workbook.Worksheet(2);
 
                 //Create a new DataTable.
                 DataTable dt = new DataTable();
@@ -36,8 +48,10 @@ namespace ReadExcel
                         foreach (IXLCell cell in row.Cells())
                         {
                             dt.Columns.Add(cell.Value.ToString());
+                            Console.WriteLine(dt);
                         }
                         firstRow = false;
+                        
                     }
 
                     else
@@ -48,10 +62,14 @@ namespace ReadExcel
                         foreach (IXLCell cell in row.Cells())
                         {
                             dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                            Console.WriteLine(dt);
                             i++;
                         }
                         idxRow++;
+                        //Console.WriteLine(dt);
                     }
+
+                    
                 }
                 return dt;
             }
