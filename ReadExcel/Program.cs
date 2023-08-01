@@ -11,6 +11,7 @@ public class Program
 
     public static void Main()
     {
+        InsertData insertData = new InsertData();
         string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
 
         Console.WriteLine("Hello World");
@@ -32,6 +33,17 @@ public class Program
         //Console.WriteLine(query);
 
         string value = "\n\nVALUES \n";
+
+        //for (int i = 0; i < Rows.Count; i++)
+        //{
+        //    Console.WriteLine("Parameters");
+        //    for (int j = 0; j < Columns.Count; j++)
+        //    {
+        //        Console.WriteLine($"{Columns[j]}: {dt.Rows[i][j]}");
+        //    }
+        //    Console.WriteLine();
+        //}
+
 
         //Console.WriteLine("VALUES");
         for (int i = 0; i < Rows.Count; i++)
@@ -69,104 +81,10 @@ public class Program
         }
 
         Console.WriteLine($"\nThe amount of sheet: { excelManager.Test(Path)}");
-
-        InsertFromQuery();
+        insertData.InsertFromSP();
+        
     }
 
 
-    public void InsertFromSP()
-    {
-        ExcelManager excelManager = new ExcelManager();
-        DataTable dt = new DataTable();
-        string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
-        dt = excelManager.ExcelRead(Path);
 
-        List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToList();
-        List<string> Rows = dt.Rows.Cast<DataRow>().Select(row => string.Join("\t", row.ItemArray)).ToList();
-
-        db.OpenConnection(ref conn);
-        for(int i = 0; i < Rows.Count; i++)
-        {
-            db.cmd.CommandText = "dbo.Insert_Entity_Table";
-            db.cmd.CommandType = CommandType.StoredProcedure;
-            db.cmd.Parameters.Clear();
-            for (int j = 0; j < Columns.Count; j++)
-            {
-
-            }
-        }
-
-
-
-
-
-    }
-
-    public static void InsertFromQuery()
-    {
-        ExcelManager excelManager = new ExcelManager();
-        DataTable dt = new DataTable();
-        string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
-        dt = excelManager.ExcelRead(Path);
-
-        List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName.Replace(" ", "_")).ToList();
-        List<string> Rows = dt.Rows.Cast<DataRow>().Select(row => string.Join("\t", row.ItemArray)).ToList();
-        string connString = "Data Source=(localdb)\\local;Initial Catalog=ExcelTest;Integrated Security=True;";
-
-        string query = $"INSERT INTO dbo.ENTITAS (\n{string.Join(",\n", Columns)}" + "\n)";
-        string value = "\n\nVALUES \n";
-
-        for (int i = 0; i < Rows.Count; i++)
-        {
-            value += "(";
-            for (int j = 0; j < Columns.Count; j++)
-            {
-
-
-                if (j == Columns.Count - 1)
-                {
-                    value += $"'{dt.Rows[i][j]}'";
-                }
-
-                else
-                {
-                    value += $"'{dt.Rows[i][j]}',";
-                }
-
-            }
-
-            if (i == Rows.Count - 1)
-            {
-                value += ")\n\n";
-            }
-
-            else
-            {
-                value += "),\n\n";
-            }
-
-        }
-
-        Console.WriteLine(query + value);
-
-        try
-        {
-            using (SqlConnection conn = new SqlConnection(connString))
-            {
-                conn.Open();
-
-
-                using (SqlCommand cmd = new SqlCommand((query + value), conn))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                conn.Close();
-            }
-            Console.WriteLine("Data inserted successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
-        }
-    }
 }
