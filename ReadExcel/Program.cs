@@ -13,7 +13,7 @@ public class Program
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\test.xlsx";
+        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc30.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();

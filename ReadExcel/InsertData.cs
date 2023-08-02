@@ -257,10 +257,10 @@ namespace ReadExcel
                                 cmd.ExecuteNonQuery();
                             }
 
-                            //using(SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
-                            //{
-                            //    cmd.ExecuteNonQuery();
-                            //}
+                            using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
 
                             Console.WriteLine("Table Created and The Data has been inserted");
                         }
