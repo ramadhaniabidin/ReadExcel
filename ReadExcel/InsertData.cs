@@ -18,7 +18,7 @@ namespace ReadExcel
 
             ExcelManager excelManager = new ExcelManager();
             DataTable dt = new DataTable();
-            string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
+            string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\test.xlsx";
             dt = excelManager.ExcelRead(Path);
 
             List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName.Replace(" ", "_")).ToList();
@@ -26,10 +26,9 @@ namespace ReadExcel
 
             try
             {
-
+                db.OpenConnection(ref conn);
                 for (int i = 0; i < Rows.Count; i++)
                 {
-                    db.OpenConnection(ref conn);
                     db.cmd.CommandText = "dbo.Insert_Table_ENTITAS";
                     db.cmd.CommandType = CommandType.StoredProcedure;
                     db.cmd.Parameters.Clear();
@@ -40,20 +39,22 @@ namespace ReadExcel
 
                         string paramName = $"{Columns[j]}";
                         object paramValue = dt.Rows[i][j];
+                        //if (((paramName is string valStr) && (string.IsNullOrWhiteSpace(valStr))) || (paramValue == null))
+                        //{
+                        //    paramValue = DBNull.Value;
+                        //}
                         db.AddInParameter(db.cmd, paramName, paramValue);
 
 
-                        Console.WriteLine($"{db.cmd.Parameters[j]} = {paramValue}");
+                        //Console.WriteLine($"{db.cmd.Parameters[j]} = {paramValue}");
 
                     }
-
+                    Console.WriteLine($"Params : \n - " + string.Join("\n - ", db.cmd.Parameters.Cast<SqlParameter>().Select(x => $"{x.ParameterName}: {x.Value}")));
                     db.cmd.ExecuteNonQuery();
-                    db.CloseConnection(ref conn);
                     //Console.WriteLine(db.cmd.Parameters);
-
-
-
                 }
+                //db.trans.Commit();
+                db.CloseConnection(ref conn);
 
 
                 Console.WriteLine("Data inserted successfully.");
@@ -70,14 +71,16 @@ namespace ReadExcel
         {
             ExcelManager excelManager = new ExcelManager();
             DataTable dt = new DataTable();
-            string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
+            string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\test.xlsx";
             dt = excelManager.ExcelRead(Path);
 
             List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName.Replace(" ", "_")).ToList();
             List<string> Rows = dt.Rows.Cast<DataRow>().Select(row => string.Join("\t", row.ItemArray)).ToList();
             string connString = "Data Source=(localdb)\\local;Initial Catalog=ExcelTest;Integrated Security=True;";
 
-            string query = $"INSERT INTO dbo.ENTITAS (\n{string.Join(",\n", Columns)}" + "\n)";
+            string SambuConnString = "Data Source=10.0.0.50;Initial Catalog=Sambu_Nintex;User Id=sa; Password=pass@word1";
+
+            string query = $"INSERT INTO tmp.ENTITAS (\n{string.Join(",\n", Columns)}" + "\n)";
             string value = "\n\nVALUES \n";
 
             for (int i = 0; i < Rows.Count; i++)
@@ -115,7 +118,7 @@ namespace ReadExcel
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connString))
+                using (SqlConnection conn = new SqlConnection(SambuConnString))
                 {
                     conn.Open();
 

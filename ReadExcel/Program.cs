@@ -12,7 +12,7 @@ public class Program
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
+        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\test.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();
@@ -80,7 +80,9 @@ public class Program
            
         }
 
+        //Console.WriteLine(query + value);
         Console.WriteLine($"\nThe amount of sheet: { excelManager.Test(Path)}");
+        //insertData.InsertFromQuery();
         insertData.InsertFromSP();
         
     }
