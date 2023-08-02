@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClosedXML.Excel;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -35,28 +36,15 @@ namespace ReadExcel
                     //db.AddInParameter(db.cmd, "NOMOR_AJU", dt.Rows[0][0]);
                     for (int j = 0; j < Columns.Count; j++)
                     {
-
-
                         string paramName = $"{Columns[j]}";
                         object paramValue = dt.Rows[i][j];
-                        //if (((paramName is string valStr) && (string.IsNullOrWhiteSpace(valStr))) || (paramValue == null))
-                        //{
-                        //    paramValue = DBNull.Value;
-                        //}
                         db.AddInParameter(db.cmd, paramName, paramValue);
-
-
-                        //Console.WriteLine($"{db.cmd.Parameters[j]} = {paramValue}");
-
                     }
-                    Console.WriteLine($"Params : \n - " + string.Join("\n - ", db.cmd.Parameters.Cast<SqlParameter>().Select(x => $"{x.ParameterName}: {x.Value}")));
+                    //Console.WriteLine($"Params : \n - " + string.Join("\n - ", db.cmd.Parameters.Cast<SqlParameter>().Select(x => $"{x.ParameterName}: {x.Value}")));
                     db.cmd.ExecuteNonQuery();
-                    //Console.WriteLine(db.cmd.Parameters);
                 }
-                //db.trans.Commit();
+                db.trans.Commit();
                 db.CloseConnection(ref conn);
-
-
                 Console.WriteLine("Data inserted successfully.");
             }
 
@@ -66,6 +54,19 @@ namespace ReadExcel
             }
 
         }
+
+        public void InsertFromQuery1(string Path)
+        {
+            using(XLWorkbook workbook = new XLWorkbook(Path))
+            {
+                for(int sh = 1; sh <= workbook.Worksheets.Count; sh++)
+                {
+                    IXLWorksheet sheet = workbook.Worksheet(sh);
+
+                }
+            }
+        }
+
 
         public void InsertFromQuery()
         {
