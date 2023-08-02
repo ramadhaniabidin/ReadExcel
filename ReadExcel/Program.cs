@@ -8,6 +8,7 @@ public class Program
     DatabaseManager db = new DatabaseManager();
     SqlConnection conn = new SqlConnection();
 
+    
 
     public static void Main()
     {
@@ -20,7 +21,13 @@ public class Program
         DataTable dt = new DataTable();
 
         dt = excelManager.ExcelRead(Path);
-        excelManager.ExcelMultipleSheets1(Path);
+        //excelManager.ExcelMultipleSheets1(Path);
+        insertData.InsertFromQuery1(Path);
+        //insertData.TestSchema();
+
+        bool con = insertData.TableExist("csa", "nota_timbang_header");
+
+        Console.WriteLine(con);
         //Console.WriteLine("Column Names:");
 
         List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName.Replace(" ", "_")).ToList();

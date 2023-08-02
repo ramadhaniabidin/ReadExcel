@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2013.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Collections.Generic;
@@ -96,10 +97,6 @@ namespace ReadExcel
                         Console.WriteLine(cell.Value.ToString());
                     }
                     Console.WriteLine();
-                    //for(int j = 0; j < worksheet.RowCount(); j++)
-                    //{
-                    //    Console.WriteLine(j);
-                    //}
                 }
 
 
@@ -110,87 +107,109 @@ namespace ReadExcel
         {
             using (XLWorkbook workbook = new XLWorkbook(Path))
             {
-                for(int sh = 1; sh <= workbook.Worksheets.Count; sh++)
+                IXLWorksheet headerSheet = workbook.Worksheet(1);
+                string KodeDokumen = "";
+                KodeDokumen = $"bc{headerSheet.Cell(2,2).Value}";
+                
+                
+                Console.WriteLine($"Kode Dokumen: {KodeDokumen}");
+
+                for (int sh = 1; sh <= workbook.Worksheets.Count; sh++)
                 {
                     IXLWorksheet sheet = workbook.Worksheet(sh);
+                    int SheetRows = sheet.LastRowUsed().RowNumber();
+                    int SheetColumns = sheet.LastColumnUsed().ColumnNumber();
+
+                    if(SheetRows == 1)
+                    {
+                        SheetRows += 1;
+                    }
 
                     List<string> Values = new List<string>();
 
                     string QuerySelect = $"SELECT TOP (1)* FROM tmp.{sheet.Name}";
                     string QueryInsert = $"INSERT INTO tmp.{sheet.Name}\n(\n";
-                    string QueryCreate = $"CREATE TABLE tmp.{sheet.Name}\n(\n";
+                    string QueryCreate = $"CREATE TABLE tmp.{KodeDokumen}_{sheet.Name}\n(\n";
 
                     string InsertValue = "";
 
-                    Console.WriteLine("Rows: " + sheet.LastRowUsed().RowNumber());
-                    Console.WriteLine("Columns: " + sheet.LastColumnUsed().ColumnNumber());
+
 
                     string ColumnToCreate = "";
-                    for(int b = 1; b <= sheet.LastColumnUsed().ColumnNumber(); b++)
+                    HashSet<string> processedColumns = new HashSet<string>();
+                    HashSet<string> processedRowsInsert = new HashSet<string>();
+
+                    Console.WriteLine("Rows: " + SheetRows);
+                    Console.WriteLine("Columns: " + SheetColumns);
+
+                    for (int b = 1; b <= SheetColumns; b++)
                     {
-                        if (b == sheet.LastColumnUsed().ColumnNumber())
+                        
+                        string columnValue = string.Join("", sheet.Cell(1, b).Value).Replace(" ", "_");
+                        if (!processedColumns.Contains(columnValue))
                         {
-                            ColumnToCreate += $"{string.Join("", sheet.Cell(1, b).Value).Replace(" ", "_")} VARCHAR(MAX)\n";
-                        }
+                            processedColumns.Add(columnValue);
+                            if (b == SheetColumns)
+                            {
+                                ColumnToCreate += $"{columnValue} VARCHAR(MAX)\n";
+                            }
 
-                        else
-                        {
-                            ColumnToCreate += $"{string.Join("", sheet.Cell(1, b).Value).Replace(" ", "_")} VARCHAR(MAX),\n";
+                            else
+                            {
+                                ColumnToCreate += $"{columnValue} VARCHAR(MAX),\n";
+                            }
                         }
-
                         
                     }
 
                     ColumnToCreate += ")\n";
 
                     //Console.WriteLine(QueryInsert);
-                    for (int i = 1; i <= sheet.LastColumnUsed().ColumnNumber(); i++)
+                    for (int i = 1; i <= SheetColumns; i++)
                     {
-                        if (i == sheet.LastColumnUsed().ColumnNumber())
+                        string rowValues = string.Join("", sheet.Cell(1, i).Value).Replace(" ", "_");
+                        if (!processedRowsInsert.Contains(rowValues))
                         {
-                            QueryInsert += $"{string.Join("", sheet.Cell(1, i).Value).Replace(" ", "_")}\n";
-                        }
+                            processedRowsInsert.Add(rowValues);
+                            if (i == SheetColumns)
+                            {
+                                QueryInsert += $"{rowValues}\n";
+                            }
 
-                        else
-                        {
-                            QueryInsert += $"{string.Join("", sheet.Cell(1, i).Value).Replace(" ", "_")},\n";
+                            else
+                            {
+                                QueryInsert += $"{rowValues},\n";
+                            }
                         }
-
-                        //Console.WriteLine(string.Join("\n,", sheet.Cell(1, i).Value).Replace(" ", "_"));
                     }
 
                     InsertValue += ")\nVALUES\n";
                     var tempVal = "";
                     //Console.WriteLine(")\nVALUES\n");
-                    for (int j = 2; j <= sheet.LastRowUsed().RowNumber(); j++)
+                    for (int j = 2; j <= SheetRows; j++)
                     {
-                        if ((j != sheet.LastRowUsed().RowNumber()))
+                        if (j != SheetRows)
                         {
-                            //Console.Write("(\n");
+
                             tempVal = "(";
                             InsertValue += "(";
-                            for (int k = 1; k <= sheet.LastColumnUsed().ColumnNumber(); k++)
+                            for (int k = 1; k <= processedRowsInsert.Count; k++)
                             {
-                                if (k == sheet.LastColumnUsed().ColumnNumber())
+
+                                if (k == processedRowsInsert.Count)
                                 {
                                     InsertValue += $"'{sheet.Cell(j, k).Value}'";
                                     tempVal += ($"'{sheet.Cell(j, k).Value}'");
-                                    //Values.Add($"'{sheet.Cell(j, k).Value}'");
-                                    //Console.Write($"'{sheet.Cell(j, k).Value}'");
                                 }
 
                                 else
                                 {
                                     InsertValue += $"'{sheet.Cell(j, k).Value}',";
                                     tempVal += ($"'{sheet.Cell(j, k).Value}'" + ", ");
-                                    //Values.Add($"'{sheet.Cell(j, k).Value}',");
-                                    //Console.Write($"'{sheet.Cell(j, k).Value}',");
                                 }
-                                //Console.WriteLine($"'{sheet.Cell(j, k).Value}',");
                             }
                             tempVal += ")";
                             InsertValue += "),\n\n";
-                            //Console.WriteLine("),\n");
 
                             Values.Add(tempVal);
                         }
@@ -199,34 +218,28 @@ namespace ReadExcel
                         {
                             tempVal = "(";
                             InsertValue += "(";
-                            //Console.Write("(");
-                            for (int k = 1; k <= sheet.LastColumnUsed().ColumnNumber(); k++)
+                            for (int k = 1; k <= processedRowsInsert.Count; k++)
                             {
-                                if (k == sheet.LastColumnUsed().ColumnNumber())
+                                if (k == processedRowsInsert.Count)
                                 {
                                     InsertValue += $"'{sheet.Cell(j, k).Value}'";
                                     tempVal += ($"'{sheet.Cell(j, k).Value}'");
-                                    //Values.Add($"'{sheet.Cell(j, k).Value}'");
-                                    //Console.Write($"'{sheet.Cell(j, k).Value}'");
                                 }
 
                                 else
                                 {
                                     InsertValue += $"'{sheet.Cell(j, k).Value}',";
                                     tempVal += ($"'{sheet.Cell(j, k).Value}'" + ", ");
-                                    //Values.Add($"'{sheet.Cell(j, k).Value}',");
-                                    //Console.Write($"'{sheet.Cell(j, k).Value}',");
                                 }
                             }
                             tempVal += ")";
                             InsertValue += ")\n\n";
-                            //Console.WriteLine(")");
                             Values.Add(tempVal);
                         }
                     }
 
-                    //Console.WriteLine($"\n\nInsert Query: \n{(QueryInsert + InsertValue)}");
-                    Console.WriteLine($"\nQuery Create: {QueryCreate + ColumnToCreate}");
+                    Console.WriteLine($"\n\nInsert Query: \n{(QueryInsert + InsertValue)}");
+                    //Console.WriteLine($"\nQuery Create: {QueryCreate + ColumnToCreate}");
                 }
 
 
