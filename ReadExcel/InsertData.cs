@@ -105,13 +105,14 @@ namespace ReadExcel
 
         }
 
-        public void InsertFromQuery1(string Path)
+        public string InsertFromQuery1(string Path)
         {
             string SambuConnString = "Data Source=10.0.0.50;Initial Catalog=Sambu_Nintex;User Id=sa; Password=pass@word1";
             try
             {
                 using (XLWorkbook workbook = new XLWorkbook(Path))
                 {
+                    string output = "";
                     IXLWorksheet headerSheet = workbook.Worksheet(1);
                     string KodeDokumen = "";
                     KodeDokumen = $"bc{headerSheet.Cell(2, 2).Value}";
@@ -246,6 +247,7 @@ namespace ReadExcel
                                 conn.Close();
                             }
                             //Console.WriteLine("Data Inserted Successfully");
+                            output = "Data Inserted Successfully";
                         }
 
                         else
@@ -262,23 +264,26 @@ namespace ReadExcel
                                 {
                                     cmd.ExecuteNonQuery();
                                 }
-
+                                output = "Table Created and The Data has been inserted";
                                 //Console.WriteLine("Table Created and The Data has been inserted");
                             }
                         }
 
                     }
 
-
+                    return output;
 
                 }
 
-                Console.WriteLine("Success");
+                
+
+                //Console.WriteLine("Success");
             }
 
             catch(Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                return $"Error: {ex.Message}";
+                //Console.WriteLine("Error: " + ex.Message);
             }
         }
 

@@ -13,7 +13,7 @@ public class Program
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc41.xlsx";
+        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc27.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();
@@ -22,7 +22,7 @@ public class Program
 
         dt = excelManager.ExcelRead(Path);
         //excelManager.ExcelMultipleSheets1(Path);
-        insertData.InsertFromQuery1(Path);
+        Console.WriteLine(insertData.InsertFromQuery1(Path));
         //insertData.TestSchema();
 
         bool con = insertData.TableExist("csa", "nota_timbang_header");
