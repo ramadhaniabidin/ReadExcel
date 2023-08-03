@@ -108,168 +108,177 @@ namespace ReadExcel
         public void InsertFromQuery1(string Path)
         {
             string SambuConnString = "Data Source=10.0.0.50;Initial Catalog=Sambu_Nintex;User Id=sa; Password=pass@word1";
-
-            using (XLWorkbook workbook = new XLWorkbook(Path))
+            try
             {
-                IXLWorksheet headerSheet = workbook.Worksheet(1);
-                string KodeDokumen = "";
-                KodeDokumen = $"bc{headerSheet.Cell(2, 2).Value}";
-
-
-                Console.WriteLine($"--Kode Dokumen: {KodeDokumen}");
-
-                for (int sh = 1; sh <= workbook.Worksheets.Count; sh++)
+                using (XLWorkbook workbook = new XLWorkbook(Path))
                 {
-                    IXLWorksheet sheet = workbook.Worksheet(sh);
-                    int SheetRows = sheet.LastRowUsed().RowNumber();
-                    int SheetColumns = sheet.LastColumnUsed().ColumnNumber();
+                    IXLWorksheet headerSheet = workbook.Worksheet(1);
+                    string KodeDokumen = "";
+                    KodeDokumen = $"bc{headerSheet.Cell(2, 2).Value}";
 
-                    if (SheetRows == 1)
+
+                    Console.WriteLine($"--Kode Dokumen: {KodeDokumen}");
+
+                    for (int sh = 1; sh <= workbook.Worksheets.Count; sh++)
                     {
-                        SheetRows += 1;
-                    }
+                        IXLWorksheet sheet = workbook.Worksheet(sh);
+                        int SheetRows = sheet.LastRowUsed().RowNumber();
+                        int SheetColumns = sheet.LastColumnUsed().ColumnNumber();
 
-                    List<string> Values = new List<string>();
-
-                    string QuerySelect = $"SELECT TOP (1)* FROM csa.{sheet.Name}";
-                    string QueryInsert = $"INSERT INTO csa.{KodeDokumen}_{sheet.Name}\n(\n";
-                    string QueryCreate = $"CREATE TABLE csa.{KodeDokumen}_{sheet.Name}\n(\n";
-
-                    string InsertValue = "";
-
-                    Console.WriteLine("--Rows: " + sheet.LastRowUsed().RowNumber());
-                    Console.WriteLine("--Columns: " + sheet.LastColumnUsed().ColumnNumber());
-
-                    string ColumnToCreate = "";
-                    HashSet<string> processedColumns = new HashSet<string>();
-                    HashSet<string> processedRowsInsert = new HashSet<string>();
-
-                    for (int b = 1; b <= SheetColumns; b++)
-                    {
-                        string columnValue = string.Join("", sheet.Cell(1, b).Value).Replace(" ", "_");
-                        if (!processedColumns.Contains(columnValue))
+                        if (SheetRows == 1)
                         {
-                            processedColumns.Add(columnValue);
-                            if (b == SheetColumns)
-                            {
-                                ColumnToCreate += $"{columnValue} VARCHAR(MAX)\n";
-                            }
-
-                            else
-                            {
-                                ColumnToCreate += $"{columnValue} VARCHAR(MAX),\n";
-                            }
+                            SheetRows += 1;
                         }
-                    }
 
-                    ColumnToCreate += ")\n";
+                        List<string> Values = new List<string>();
 
-                    //Console.WriteLine(QueryInsert);
-                    for (int i = 1; i <= SheetColumns; i++)
-                    {
-                        string rowValues = string.Join("", sheet.Cell(1, i).Value).Replace(" ", "_");
-                        if (!processedRowsInsert.Contains(rowValues))
+                        string QuerySelect = $"SELECT TOP (1)* FROM csa.{sheet.Name}";
+                        string QueryInsert = $"INSERT INTO csa.{KodeDokumen}_{sheet.Name}\n(\n";
+                        string QueryCreate = $"CREATE TABLE csa.{KodeDokumen}_{sheet.Name}\n(\n";
+
+                        string InsertValue = "";
+
+                        Console.WriteLine("--Rows: " + sheet.LastRowUsed().RowNumber());
+                        Console.WriteLine("--Columns: " + sheet.LastColumnUsed().ColumnNumber());
+
+                        string ColumnToCreate = "";
+                        HashSet<string> processedColumns = new HashSet<string>();
+                        HashSet<string> processedRowsInsert = new HashSet<string>();
+
+                        for (int b = 1; b <= SheetColumns; b++)
                         {
-                            processedRowsInsert.Add(rowValues);
-                            if (i == SheetColumns)
+                            string columnValue = string.Join("", sheet.Cell(1, b).Value).Replace(" ", "_");
+                            if (!processedColumns.Contains(columnValue))
                             {
-                                QueryInsert += $"{rowValues}\n";
-                            }
-
-                            else
-                            {
-                                QueryInsert += $"{rowValues},\n";
-                            }
-                        }
-                    }
-
-                    InsertValue += ")\nVALUES\n";
-                    for (int j = 2; j <= SheetRows; j++)
-                    {
-                        if ((j != SheetRows))
-                        {
-                            InsertValue += "(";
-                            for (int k = 1; k <= processedRowsInsert.Count; k++)
-                            {
-                                string cellValue = sheet.Cell(j, k).Value.ToString() != null ? sheet.Cell(j, k).Value.ToString() : "";
-
-                                if (k == processedRowsInsert.Count)
+                                processedColumns.Add(columnValue);
+                                if (b == SheetColumns)
                                 {
-                                    InsertValue += $"'{cellValue}'";
+                                    ColumnToCreate += $"{columnValue} VARCHAR(MAX)\n";
                                 }
 
                                 else
                                 {
-                                    InsertValue += $"'{cellValue}',";
+                                    ColumnToCreate += $"{columnValue} VARCHAR(MAX),\n";
                                 }
                             }
-                            InsertValue += "),\n\n";
+                        }
+
+                        ColumnToCreate += ")\n";
+
+                        //Console.WriteLine(QueryInsert);
+                        for (int i = 1; i <= SheetColumns; i++)
+                        {
+                            string rowValues = string.Join("", sheet.Cell(1, i).Value).Replace(" ", "_");
+                            if (!processedRowsInsert.Contains(rowValues))
+                            {
+                                processedRowsInsert.Add(rowValues);
+                                if (i == SheetColumns)
+                                {
+                                    QueryInsert += $"{rowValues}\n";
+                                }
+
+                                else
+                                {
+                                    QueryInsert += $"{rowValues},\n";
+                                }
+                            }
+                        }
+
+                        InsertValue += ")\nVALUES\n";
+                        for (int j = 2; j <= SheetRows; j++)
+                        {
+                            if ((j != SheetRows))
+                            {
+                                InsertValue += "(";
+                                for (int k = 1; k <= processedRowsInsert.Count; k++)
+                                {
+                                    string cellValue = sheet.Cell(j, k).Value.ToString() != null ? sheet.Cell(j, k).Value.ToString() : "";
+
+                                    if (k == processedRowsInsert.Count)
+                                    {
+                                        InsertValue += $"'{cellValue}'";
+                                    }
+
+                                    else
+                                    {
+                                        InsertValue += $"'{cellValue}',";
+                                    }
+                                }
+                                InsertValue += "),\n\n";
+                            }
+
+                            else
+                            {
+                                InsertValue += "(";
+                                //Console.Write("(");
+                                for (int k = 1; k <= processedRowsInsert.Count; k++)
+                                {
+                                    if (k == processedRowsInsert.Count)
+                                    {
+                                        InsertValue += $"'{sheet.Cell(j, k).Value}'";
+                                    }
+
+                                    else
+                                    {
+                                        InsertValue += $"'{sheet.Cell(j, k).Value}',";
+                                    }
+                                }
+                                InsertValue += ")\n\n";
+                            }
+                        }
+
+                        //Console.WriteLine($"\n\n--Select Query: \n{(QuerySelect)}");
+                        //Console.WriteLine($"\n\n--Insert Query: \n{(QueryInsert + InsertValue)}");
+                        //Console.WriteLine($"\n--Query Create:\n{QueryCreate + ColumnToCreate}");
+
+                        bool con = TableExist("csa", $"{KodeDokumen}_{sheet.Name}");
+                        //Console.WriteLine(con);
+
+                        if (con == true)
+                        {
+                            using (SqlConnection conn = new SqlConnection(SambuConnString))
+                            {
+                                conn.Open();
+                                using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
+                                {
+                                    cmd.ExecuteNonQuery();
+                                }
+                                conn.Close();
+                            }
+                            //Console.WriteLine("Data Inserted Successfully");
                         }
 
                         else
                         {
-                            InsertValue += "(";
-                            //Console.Write("(");
-                            for (int k = 1; k <= processedRowsInsert.Count; k++)
+                            using (SqlConnection conn = new SqlConnection((SambuConnString)))
                             {
-                                if (k == processedRowsInsert.Count)
+                                conn.Open();
+                                using (SqlCommand cmd = new SqlCommand((QueryCreate + ColumnToCreate), conn))
                                 {
-                                    InsertValue += $"'{sheet.Cell(j, k).Value}'";
+                                    cmd.ExecuteNonQuery();
                                 }
 
-                                else
+                                using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
                                 {
-                                    InsertValue += $"'{sheet.Cell(j, k).Value}',";
+                                    cmd.ExecuteNonQuery();
                                 }
+
+                                //Console.WriteLine("Table Created and The Data has been inserted");
                             }
-                            InsertValue += ")\n\n";
                         }
+
                     }
 
-                    //Console.WriteLine($"\n\n--Select Query: \n{(QuerySelect)}");
-                    //Console.WriteLine($"\n\n--Insert Query: \n{(QueryInsert + InsertValue)}");
-                    //Console.WriteLine($"\n--Query Create:\n{QueryCreate + ColumnToCreate}");
 
-                    bool con = TableExist("csa", $"{KodeDokumen}_{sheet.Name}");
-                    //Console.WriteLine(con);
-
-                    if (con == true)
-                    {
-                        using (SqlConnection conn = new SqlConnection(SambuConnString))
-                        {
-                            conn.Open();
-                            using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
-                            {
-                                cmd.ExecuteNonQuery();
-                            }
-                            conn.Close();
-                        }
-                        Console.WriteLine("Data Inserted Successfully");
-                    }
-
-                    else
-                    {
-                        using (SqlConnection conn = new SqlConnection((SambuConnString)))
-                        {
-                            conn.Open();
-                            using (SqlCommand cmd = new SqlCommand((QueryCreate + ColumnToCreate), conn))
-                            {
-                                cmd.ExecuteNonQuery();
-                            }
-
-                            using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
-                            {
-                                cmd.ExecuteNonQuery();
-                            }
-
-                            Console.WriteLine("Table Created and The Data has been inserted");
-                        }
-                    }
 
                 }
 
+                Console.WriteLine("Success");
+            }
 
-
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
 
