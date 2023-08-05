@@ -11,7 +11,7 @@ namespace ReadExcel
     public class DatabaseManager
     {
         public string connString = "Data Source=(localdb)\\local;Initial Catalog=ExcelTest;Integrated Security=True;";
-        public SqlCommand cmd;
+        public SqlCommand cmd = new SqlCommand();
         public SqlDataReader dReader;
         public SqlTransaction trans;
 
