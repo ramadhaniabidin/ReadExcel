@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -10,8 +11,13 @@ namespace ReadExcel
 {
     public class DatabaseManager
     {
+<<<<<<< HEAD
         public string connString = "Data Source=(localdb)\\local;Initial Catalog=ExcelTest;Integrated Security=True;";
         public SqlCommand cmd = new SqlCommand();
+=======
+        public string connString = "Data Source=10.0.0.50;Initial Catalog=Sambu_Nintex; User Id=sa; Password=pass@word1";
+        public SqlCommand cmd;
+>>>>>>> cd672a15a2eef963153a2639a24a2ea6f7e240cb
         public SqlDataReader dReader;
         public SqlTransaction trans;
 

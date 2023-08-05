@@ -8,11 +8,12 @@ public class Program
     DatabaseManager db = new DatabaseManager();
     SqlConnection conn = new SqlConnection();
 
+    
 
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\Bidin\\Downloads\\test.xlsx";
+        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc27.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();
@@ -20,13 +21,20 @@ public class Program
         DataTable dt = new DataTable();
 
         dt = excelManager.ExcelRead(Path);
-        Console.WriteLine("Column Names:");
+        //excelManager.ExcelMultipleSheets1(Path);
+        Console.WriteLine(insertData.InsertFromQuery1(Path));
+        //insertData.TestSchema();
+
+        bool con = insertData.TableExist("csa", "nota_timbang_header");
+
+        Console.WriteLine(con);
+        //Console.WriteLine("Column Names:");
 
         List<string> Columns = dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName.Replace(" ", "_")).ToList();
         List<string> Rows = dt.Rows.Cast<DataRow>().Select(row => string.Join("\t", row.ItemArray)).ToList();
 
-        Console.WriteLine($"Column count: {Columns.Count}");
-        Console.WriteLine($"Row count: {Rows.Count}\n");
+        //Console.WriteLine($"Column count: {Columns.Count}");
+        //Console.WriteLine($"Row count: {Rows.Count}\n");
 
 
         string query = $"INSERT INTO TABLE (\n{string.Join(",\n", Columns)}" + "\n)";
@@ -80,9 +88,12 @@ public class Program
            
         }
 
-        Console.WriteLine($"\nThe amount of sheet: { excelManager.Test(Path)}");
-        insertData.InsertFromSP();
-        
+        //Console.WriteLine(query + value);
+        //Console.WriteLine($"\nThe amount of sheet: { dt}");
+        //insertData.InsertFromQuery();
+        //insertData.InsertFromSP();
+        //List<string> SheetNames = excelManager.GetSheetNames(Path);
+        //Console.WriteLine(string.Join("\n", SheetNames));
     }
 
 
