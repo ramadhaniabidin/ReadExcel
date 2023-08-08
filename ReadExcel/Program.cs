@@ -1,4 +1,5 @@
-﻿using ReadExcel;
+﻿using ClosedXML.Excel;
+using ReadExcel;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -13,21 +14,50 @@ public class Program
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc41.xlsx";
+        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc25.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();
         DatabaseManager databaseManager = new DatabaseManager();
         DataTable dt = new DataTable();
 
-        dt = excelManager.ExcelRead(Path);
-        //excelManager.ExcelMultipleSheets1(Path);
-        Console.WriteLine(insertData.InsertFromQuery1(Path));
-        //insertData.TestSchema();
+        //XLWorkbook UpdatedWorkbook = excelManager.RemoveDuplicateColumns1(Path);
+        //excelManager.TestRemove(Path);
 
-        bool con = insertData.TableExist("csa", "nota_timbang_header");
+        //using (XLWorkbook OriginalWorkbook = new XLWorkbook(Path))
+        //{
 
-        Console.WriteLine($"Output: {insertData.InsertFromQuery2(Path)}");
+        //    for (int sh = 1; sh <= OriginalWorkbook.Worksheets.Count; sh++)
+        //    {
+        //        var OWBSheet = OriginalWorkbook.Worksheet(sh);
+
+        //        Console.WriteLine("Original workbook columns: ");
+        //        for (int i = 1; i <= OWBSheet.LastColumnUsed().ColumnNumber(); i++)
+        //        {
+        //            Console.WriteLine(OWBSheet.Cell(1, i).Value);
+        //        }
+
+        //        Console.WriteLine();
+        //    }
+        //}
+        //Console.WriteLine();
+
+        //for(int sh = 1; sh <= UpdatedWorkbook.Worksheets.Count; sh++)
+        //{
+        //    var UpdatedSHeet = UpdatedWorkbook.Worksheet(sh);
+        //    Console.WriteLine("Updated workbook columns:");
+        //    for(int i = 1; i <= UpdatedSHeet.LastColumnUsed().ColumnNumber(); i++)
+        //    {
+        //        Console.WriteLine(UpdatedSHeet.Cell(1, i).Value);
+        //    }
+
+        //    Console.WriteLine() ;
+        //}
+
+        Console.WriteLine($"{insertData.InsertFromQuery2(Path)}");
+
+        //excelManager.RemoveDuplicateColumns(Path);
+
     }
 
 

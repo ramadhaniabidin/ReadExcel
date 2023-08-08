@@ -14,6 +14,132 @@ namespace ReadExcel
     public class ExcelManager
     {
 
+        public void TestRemove(string Path)
+        {
+            using(var workbook = new XLWorkbook(Path))
+            {
+                var columns = new List<string>();   
+                var columnsToRemove = new List<int>();
+
+
+                for(int i = 1; i <= workbook.Worksheet(14).LastColumnUsed().ColumnNumber(); i++)
+                {
+                    if (!columns.Contains(workbook.Worksheet(14).Cell(1, i).Value.ToString()))
+                    {
+                        columns.Add(workbook.Worksheet(14).Cell(1, i).Value.ToString());
+                    }
+
+                    else
+                    {
+                        columnsToRemove.Add(i);
+                    }
+                    //Console.WriteLine(sheet.Cell(1,i).Value.ToString());
+                }
+
+                foreach(var col in columnsToRemove)
+                {
+                    workbook.Worksheet(14).Column(col).Delete();
+                }
+
+                workbook.Save();
+                Console.WriteLine("Columns to remove");
+                foreach (var colToRemove in columnsToRemove)
+                {
+                    workbook.Worksheet(14).Column(colToRemove).Delete();
+                }
+            }
+
+            var UpdatedWorkbook = new XLWorkbook(Path);
+
+
+            for (int i = 1; i <= UpdatedWorkbook.Worksheet(14).LastColumnUsed().ColumnNumber(); i++)
+            {
+                Console.WriteLine(UpdatedWorkbook.Worksheet(14).Cell(1, i).Value);
+            }
+        }
+
+        public void RemoveDuplicateColumns(string Path)
+        {
+            using(var workbook = new XLWorkbook(Path))
+            {
+                for(int sh = 1; sh <= workbook.Worksheets.Count; sh++)
+                {
+                    var workSheet = workbook.Worksheet(sh);
+                    var columns = new HashSet<string>();
+                    var indexColumnToRemove = new HashSet<int>();
+
+                    for(int i = 1; i <= workSheet.LastColumnUsed().ColumnNumber(); i++)
+                    {
+                        if (!columns.Contains(workSheet.Cell(1, i).Value.ToString()))
+                        {
+                            columns.Add(workSheet.Cell(1, i).Value.ToString());
+                        }
+
+                        else
+                        {
+                            indexColumnToRemove.Add(i);
+                        }
+
+                        
+                    }
+
+                    foreach(int colIndex in indexColumnToRemove.OrderByDescending(i => i))
+                    {
+                        workSheet.Column(colIndex).Delete();
+                    }
+
+                   
+                }
+
+                workbook.Save();
+            }
+
+        }
+
+
+        public XLWorkbook RemoveDuplicateColumns1(string Path)
+        {
+            using (var workbook = new XLWorkbook(Path))
+            {
+                foreach (var sheet in workbook.Worksheets)
+                {
+                    var columns = new Dictionary<int, IXLColumn>();
+                    var columnsToRemove = new List<IXLColumn>();
+
+                    foreach (var col in sheet.Columns())
+                    {
+                        if (!columns.ContainsKey(col.ColumnNumber()))
+                        {
+                            columns[col.ColumnNumber()] = col;
+                        }
+
+                        else
+                        {
+                            if (columns[col.ColumnNumber()].CellsUsed().SequenceEqual(col.CellsUsed()))
+                            {
+                                columnsToRemove.Add(col);
+                            }
+                        }
+                    }
+
+                    foreach (var colToRemove in columnsToRemove)
+                    {
+                        sheet.Column(colToRemove.ColumnNumber()).Delete();
+                    }
+
+                }
+
+
+                workbook.Save();
+
+                //XLWorkbook ReturnedWorkbook = 
+
+                return workbook;
+
+            }
+        }
+
+
         public List<string> GetSheetNames(string Path)
         {
             List<string> SheetNames = new List<string>();
