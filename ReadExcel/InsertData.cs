@@ -37,6 +37,29 @@ namespace ReadExcel
             }
         }
 
+        public bool RowExist(string NomorAju, string kodeDokumen)
+        {
+            string SambuConnString = "Data Source=10.0.0.50;Initial Catalog=Sambu_Nintex;User Id=sa; Password=pass@word1";
+            string query = $"SELECT * FROM csa.{kodeDokumen}_HEADER WHERE NOMOR_AJU = '{NomorAju}'";
+
+            using(SqlConnection con = new SqlConnection(SambuConnString))
+            {
+                con.Open();
+                using(SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    object res = cmd.ExecuteScalar();
+                    if(res != null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
 
         public void TestSchema()
         {
@@ -349,6 +372,7 @@ namespace ReadExcel
                         string QueryInsert = $"INSERT INTO csa.{KodeDokumen}_{sheet.Name}\n(\n";
                         string QueryCreate = $"CREATE TABLE csa.{KodeDokumen}_{sheet.Name}\n(\nID INT IDENTITY(1,1),\n";
 
+
                         string InsertValue = "";
 
                         Console.WriteLine("--Rows: " + sheet.LastRowUsed().RowNumber());
@@ -471,45 +495,63 @@ namespace ReadExcel
                         }
 
                         //Console.WriteLine($"\n\n--Select Query: \n{(QuerySelect)}");
-                        Console.WriteLine($"\n\n--Insert Query: \n{(QueryInsert + InsertValue)}");
-                        Console.WriteLine($"\n--Query Create:\n{QueryCreate + ColumnToCreate}");
+                        //Console.WriteLine($"\n\n--Insert Query: \n{(QueryInsert + InsertValue)}");
+                        //Console.WriteLine($"\n--Query Create:\n{QueryCreate + ColumnToCreate}");
 
-                        //bool con = TableExist("csa", $"{KodeDokumen}_{sheet.Name}");
-                        //Console.WriteLine(con);
+                        bool con = TableExist("csa", $"{KodeDokumen}_{sheet.Name}");
+                        Console.WriteLine(con);
 
-                        //if (con == true)
-                        //{
-                        //    using (SqlConnection conn = new SqlConnection(SambuConnString))
-                        //    {
-                        //        conn.Open();
-                        //        using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
-                        //        {
-                        //            cmd.ExecuteNonQuery();
-                        //        }
-                        //        conn.Close();
-                        //    }
-                        //    //Console.WriteLine("Data Inserted Successfully");
-                        //    output = "Data Inserted Successfully";
-                        //}
+                        if (con == true)
+                        {
+                            //using (SqlConnection conn = new SqlConnection(SambuConnString))
+                            //{
+                            //    conn.Open();
+                            //    using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
+                            //    {
+                            //        cmd.ExecuteNonQuery();
+                            //    }
+                            //    conn.Close();
+                            //}
+                            //Console.WriteLine("Data Inserted Successfully");
+                            string code = headerSheet.Cell(2, 2).Value.ToString();
 
-                        //else
-                        //{
-                        //    using (SqlConnection conn = new SqlConnection((SambuConnString)))
-                        //    {
-                        //        conn.Open();
-                        //        using (SqlCommand cmd = new SqlCommand((QueryCreate + ColumnToCreate), conn))
-                        //        {
-                        //            cmd.ExecuteNonQuery();
-                        //        }
+                            bool exist = RowExist(sheet.Cell(2,1).Value.ToString(), KodeDokumen);
+                            if(exist == true)
+                            {
+                                string Query = $"DELETE FROM csa.{KodeDokumen}_{sheet.Name} WHERE NOMOR AJU = '{sheet.Cell(2, 1).Value.ToString()}'";
+                                Console.WriteLine($"{Query}\n{(QueryInsert + InsertValue)}");
+                                   
+                            }
 
-                        //        using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
-                        //        {
-                        //            cmd.ExecuteNonQuery();
-                        //        }
-                        //        output = "Table Created and The Data has been inserted";
-                        //        //Console.WriteLine("Table Created and The Data has been inserted");
-                        //    }
-                        //}
+                            else
+                            {
+                                Console.WriteLine($"{(QueryInsert + InsertValue)}");
+                            }
+
+                            output = "Data Inserted Successfully";
+                        }
+
+                        else
+                        {
+                            //using (SqlConnection conn = new SqlConnection((SambuConnString)))
+                            //{
+                            //    conn.Open();
+                            //    using (SqlCommand cmd = new SqlCommand((QueryCreate + ColumnToCreate), conn))
+                            //    {
+                            //        cmd.ExecuteNonQuery();
+                            //    }
+
+                            //    using (SqlCommand cmd = new SqlCommand((QueryInsert + InsertValue), conn))
+                            //    {
+                            //        cmd.ExecuteNonQuery();
+                            //    }
+                                
+                            //    //Console.WriteLine("Table Created and The Data has been inserted");
+                            //}
+                            Console.WriteLine($"{(QueryInsert + InsertValue)}");
+
+                            output = "Table Created and The Data has been inserted";
+                        }
 
                     }
 
