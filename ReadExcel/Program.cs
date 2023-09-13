@@ -14,7 +14,7 @@ public class Program
     public static void Main()
     {
         InsertData insertData = new InsertData();
-        string Path = "C:\\Users\\ramad\\OneDrive\\Documents\\Belajar\\ReadExcel\\bc25.xlsx";
+        string Path = "C:\\Users\\ramad\\Downloads\\BC 1.1 BM Voy 49 SN.xlsx";
 
         Console.WriteLine("Hello World");
         ExcelManager excelManager = new ExcelManager();
